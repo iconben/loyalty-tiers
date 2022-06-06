@@ -9,8 +9,12 @@ import customersRouter from './routes/customers';
 import ordersRouter from './routes/orders';
 import http from 'http';
 import debug from 'debug';
+import { DbInitiator } from './config/db-initiator';
 
 const app = express();
+const dbInitiator = new DbInitiator();
+
+dbInitiator.createDatabase();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -101,11 +105,11 @@ app.use((err: any, req: any, res: any, next: any) => {
    // handle specific listen errors with friendly messages
    switch (error.code) {
      case 'EACCES':
-       logger.error(bind + ' requires elevated privileges');
+      debug(bind + ' requires elevated privileges');
        process.exit(1);
        break;
      case 'EADDRINUSE':
-       logger.error(bind + ' is already in use');
+      debug(bind + ' is already in use');
        process.exit(1);
        break;
      default:

@@ -1,10 +1,11 @@
 import express, { Express, Request, Response } from 'express';
-import { CustomerRepository } from '../repositories/customer';
-import { OrderRepository } from '../repositories/order';
-import Db from '../repositories/db';
+import { CustomerRepository } from '../repositories/customer-repository';
+import { OrderRepository } from '../repositories/order-repository';
+import { IOrder } from '../models/order';
+import { debug } from 'console';
 
-const customerRepository = new CustomerRepository(new Db());
-const orderRepository = new OrderRepository(new Db());
+const customerRepository = new CustomerRepository();
+const orderRepository = new OrderRepository();
 
 const app: Express = express();
 
@@ -19,10 +20,14 @@ app.use(express.json());
  */
 app.get('/:customerId', (req: Request, res: Response, next) => {
     customerRepository.getCustomerWithStats(req.params.customerId).then((result: any) => {
-        res.send(result);
+        if (result == null) {
+          res.status(404).end();
+        } else {
+          res.send(result);
+        }
       }).catch((err: any) => {
           res.status(500).send({
-            Message: 'Query failed.',
+            message: 'Query failed.',
             error: err
           });
         });
@@ -35,22 +40,33 @@ app.get('/:customerId', (req: Request, res: Response, next) => {
  * @returns a list of orders ordered by date desc
  */
 app.get('/:customerId/orders', (req: Request, res: Response, next) => {
-    // calculate the start time of last year day 1
-    let startDate: any = new Date();
-    startDate.setFullYear(startDate.getFullYear() - 1);
-    startDate.setMonth(0);
-    startDate.setDate(1);
-    startDate = startDate.getTime();
+
+    const startDate: any = getLastYearDayOneTime();
 
     // get the orders of the customer and return
-    orderRepository.getCustomerOrders(req.params.customerId, startDate).then((result: any) => {
-        res.send(result);
-      }).catch((err: any) => {
-        res.status(500).send({
-          Message: 'Query failed.',
-          error: err
-        });
+    orderRepository.getCustomerOrders(req.params.customerId, startDate).then((result: IOrder[]) => {
+      debug(result);
+      res.send(result);
+    }).catch((err: any) => {
+      res.status(500).send({
+        message: 'Query failed.',
+        error: err
       });
+    });
   });
+
+// calculate the start time of last year day 1 from local time
+function getLastYearDayOneTime(): number {
+  const startDate: Date = new Date();
+  startDate.setFullYear(startDate.getFullYear() - 1);
+  startDate.setMonth(0);
+  startDate.setDate(1);
+  startDate.setHours(0);
+  startDate.setMinutes(0);
+  startDate.setSeconds(0);
+  startDate.setMilliseconds(0);
+  debug(startDate.toLocaleString());
+  return startDate.getTime();
+}
 
 export default app;

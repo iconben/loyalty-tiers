@@ -1,24 +1,23 @@
 import mysql from 'mysql2/promise';
 import { ConnectionOptions } from 'mysql2/typings/mysql';
-import { Config } from '../config';
+import { Config } from './config';
 
-export default class Db {
+export class DbInitiator{
   async createDatabase(): Promise<any> {
     const sql = `
       CREATE DATABASE IF NOT EXISTS ${Config.db.database};
 
       USE ${Config.db.database};
 
-      CREATE TABLE IF NOT EXISTS customer_order (
+      CREATE TABLE IF NOT EXISTS \`order\` (
         order_id varchar(50) NOT NULL,
         customer_id varchar(50) NOT NULL,
         customer_name varchar(50) NOT NULL,
         total_in_cents int(11) NOT NULL,
-        date timestamp NOT NULL,
-        PRIMARY KEY (order_id)
+        date timestamp(3) NOT NULL,
+        PRIMARY KEY (order_id),
+        KEY order_customer_id_index (customer_id)
       );
-
-      CREATE INDEX customer_order_customer_id_index ON customer_order (customer_id);
 
       CREATE TABLE IF NOT EXISTS loyalty_policy (
         id INT NOT NULL AUTO_INCREMENT,
@@ -36,7 +35,7 @@ export default class Db {
         id varchar(50) NOT NULL,
         name varchar(50) NOT NULL,
         current_tier_id int(11) NOT NULL,
-        calc_start_date timestamp,
+        calc_start_date timestamp(3),
         PRIMARY KEY (id)
       );
 
@@ -46,8 +45,8 @@ export default class Db {
         customer_name varchar(50) NOT NULL,
         tier_id int(11) NOT NULL,
         tier_name varchar(50) NOT NULL,
-        calc_start_date timestamp NOT NULL,
-        date timestamp NOT NULL,
+        calc_start_date timestamp(3) NOT NULL,
+        date timestamp(3) NOT NULL,
         PRIMARY KEY (id)
       );
     `;
@@ -57,15 +56,5 @@ export default class Db {
     dbConfig.multipleStatements = true;
     const connection = await mysql.createConnection(dbConfig);
     return connection.query(sql);
-  }
-
-  async query(sql: any): Promise<any> {
-    const connection = await mysql.createConnection(Config.db);
-    return connection.execute(sql);
-  }
-
-  async queryEx(sql: any, params: any): Promise<any> {
-    const connection = await mysql.createConnection(Config.db);
-    return connection.execute(sql, params);
   }
 }

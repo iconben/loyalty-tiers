@@ -1,23 +1,23 @@
 import express, { Express, Request, Response } from 'express';
-import Db from '../repositories/db';
+import { DbInitiator } from '../config/db-initiator';
 
 const app: Express = express();
-const db = new Db();
+const dbInitiator = new DbInitiator();
 
 /**
  * @api {post} /create-database
  * @description Create the database
  */
 app.get('/', (req: Request, res: Response, next: any) => {
-    db.createDatabase().then((result: any) => {
+    dbInitiator.createDatabase().then((result: any) => {
         res.send({
-          Message: 'Query executed successfully.',
+          message: 'Query executed successfully.',
           details: result
         });
         res.end();
       }).catch((err: any) => {
           res.status(500).send({
-            Message: 'Query failed.',
+            message: 'Query failed.',
             error: err
           });
         });
