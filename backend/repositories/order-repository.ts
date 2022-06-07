@@ -1,5 +1,5 @@
 import { AbstractRepository } from './abstract-repository';
-import { IOrder } from '../models/order';
+import { Order } from '../models/order';
 import { debug } from 'console';
 import { dbDateTimeUtil } from '../utilities/dbDateTimeUtil';
 import { RowDataPacket } from 'mysql2';
@@ -14,7 +14,7 @@ export class OrderRepository extends AbstractRepository {
    * @param order the order to save
    * @returns status code 201 if success
    */
-  save(order: IOrder): Promise<any> {
+  save(order: Order): Promise<any> {
     const timestamp = dbDateTimeUtil.fromISOString(order.date);
     return this.execute(
       `INSERT INTO \`order\` (order_id, customer_id, customer_name, total_in_cents, date)
@@ -47,7 +47,7 @@ export class OrderRepository extends AbstractRepository {
    * @param customerId the customer id
    * @param fromDate the start date time in db format (YYYY-MM-DD HH:MM:SS.ms)
    * @param toDate the to date time in db format (YYYY-MM-DD HH:MM:SS.ms)
-   * @returns
+   * @returns an integer representing the total spent in cents
    */
   async getCustomerOrdersTotalInCents(customerId: string, fromDate: string, toDate: string): Promise<number> {
     const result: RowDataPacket[] = await this.query(`
@@ -58,6 +58,6 @@ export class OrderRepository extends AbstractRepository {
       AND date <= '${toDate}';
       `
     )
-    return Promise.resolve(result[0][0].totalInCents == null ? 0 : result[0][0].totalInCents);
+    return Promise.resolve(result[0][0].totalInCents == null ? 0 : parseInt(result[0][0].totalInCents, 10));
   }
 }

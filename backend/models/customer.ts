@@ -1,26 +1,17 @@
-export interface ICustomer {
+export class Customer {
     id: string;
     name: string;
     currentTierId: number;
-    spentFromDate: Date;
-    spentToDate: Date;
-    spentInCents: number;
-}
+    calcFromDate: Date;
+    calcToDate: Date;
+    calcSpentInCents: number;
 
-export class Customer implements ICustomer {
-    id: string;
-    name: string;
-    currentTierId: number;
-    spentFromDate: Date;
-    spentToDate: Date;
-    spentInCents: number;
-
-    constructor(id: string, name: string, currentTierId: number, spentFromDate: Date = null, spentToDate: Date = null, spentInCents: number = 0) {
+    constructor(id: string, name: string, currentTierId: number, calcFromDate: Date = null, calcToDate: Date = null, calcSpentInCents: number = 0) {
         this.id = id;
         this.name = name;
         this.currentTierId = currentTierId;
-        this.spentFromDate = spentFromDate;
-        this.spentToDate = spentToDate;
-        this.spentInCents = spentInCents;
+        this.calcFromDate = calcFromDate;
+        this.calcToDate = calcToDate;
+        this.calcSpentInCents = calcSpentInCents;
     }
 }

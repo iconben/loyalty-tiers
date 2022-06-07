@@ -19,25 +19,25 @@ export class DbInitiator{
         KEY order_customer_id_index (customer_id)
       );
 
-      CREATE TABLE IF NOT EXISTS loyalty_policy (
+      CREATE TABLE IF NOT EXISTS tier_rule (
         id INT NOT NULL AUTO_INCREMENT,
         name VARCHAR(50) NOT NULL,
-        min_total_spent_in_cents INT NOT NULL,
+        min_spent_in_cents INT NOT NULL,
         description VARCHAR(255) NOT NULL,
         PRIMARY KEY (id)
       );
 
-      INSERT IGNORE INTO loyalty_policy (id, name, min_total_spent_in_cents, description) VALUES (1, 'Bronze', 0, 'default tier, from $0 spent');
-      INSERT IGNORE INTO loyalty_policy (id, name, min_total_spent_in_cents, description) VALUES (2, 'Silver', 10000, 'at least $100 spent since the start of last year');
-      INSERT IGNORE INTO loyalty_policy (id, name, min_total_spent_in_cents, description) VALUES (3, 'Gold', 50000, 'at least $500 spent since the start of last year');
+      INSERT IGNORE INTO tier_rule (id, name, min_spent_in_cents, description) VALUES (1, 'Bronze', 0, 'default tier, from $0 spent');
+      INSERT IGNORE INTO tier_rule (id, name, min_spent_in_cents, description) VALUES (2, 'Silver', 10000, 'at least $100 spent since the start of last year');
+      INSERT IGNORE INTO tier_rule (id, name, min_spent_in_cents, description) VALUES (3, 'Gold', 50000, 'at least $500 spent since the start of last year');
 
       CREATE TABLE IF NOT EXISTS customer (
         id varchar(50) NOT NULL,
         name varchar(50) NOT NULL,
         current_tier_id int(11) NOT NULL,
-        spent_from_date datetime(3),
-        spent_to_date datetime(3),
-        spent_in_cents INT,
+        calc_from_date datetime(3),
+        calc_to_date datetime(3),
+        calc_spent_in_cents INT,
         PRIMARY KEY (id)
       );
 
@@ -47,9 +47,9 @@ export class DbInitiator{
         customer_name varchar(50) NOT NULL,
         tier_id int(11) NOT NULL,
         tier_name varchar(50) NOT NULL,
-        spent_from_date datetime(3) NOT NULL,
-        spent_to_date datetime(3) NOT NULL,
-        spent_in_cents INT NOT NULL,
+        calc_from_date datetime(3) NOT NULL,
+        calc_to_date datetime(3) NOT NULL,
+        calc_spent_in_cents INT NOT NULL,
         calc_date datetime NOT NULL,
         PRIMARY KEY (id)
       );
@@ -62,3 +62,5 @@ export class DbInitiator{
     return connection.query(sql);
   }
 }
+
+export const dbInitiator = new DbInitiator();

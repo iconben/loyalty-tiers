@@ -1,12 +1,4 @@
-export interface IOrder {
-    orderId: string;
-    customerId: string;
-    customerName: string;
-    totalInCents: number;
-    date: string;
-}
-
-export class Order implements IOrder {
+export class Order {
     orderId: string;
     customerId: string;
     customerName: string;

@@ -9,12 +9,14 @@ import customersRouter from './routes/customers';
 import ordersRouter from './routes/orders';
 import http from 'http';
 import debug from 'debug';
-import { DbInitiator } from './config/db-initiator';
+import { dbInitiator } from './config/db-initiator';
+import { scheduleInitiator } from './config/schedule-initiator';
 
 const app = express();
-const dbInitiator = new DbInitiator();
 
-dbInitiator.createDatabase();
+dbInitiator.createDatabase().then(() => {
+    scheduleInitiator.createSchedules();
+  });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
