@@ -22,6 +22,11 @@ Navigate to the 'backend' folder and start the server at port 3000 by shell comm
 ```shell
 npm start
 ```
+
+The endpoint to report completed order:
+
+http://localhost:3000/orders (change the host and port according to your settings)
+
 ### Develop backend
 If you want to develop the backend with hot reload, run:
 ```shell

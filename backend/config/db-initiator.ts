@@ -14,7 +14,7 @@ export class DbInitiator{
         customer_id varchar(50) NOT NULL,
         customer_name varchar(50) NOT NULL,
         total_in_cents int(11) NOT NULL,
-        date timestamp(3) NOT NULL,
+        date datetime(3) NOT NULL,
         PRIMARY KEY (order_id),
         KEY order_customer_id_index (customer_id)
       );
@@ -35,7 +35,9 @@ export class DbInitiator{
         id varchar(50) NOT NULL,
         name varchar(50) NOT NULL,
         current_tier_id int(11) NOT NULL,
-        calc_start_date timestamp(3),
+        spent_from_date datetime(3),
+        spent_to_date datetime(3),
+        spent_in_cents INT,
         PRIMARY KEY (id)
       );
 
@@ -45,8 +47,10 @@ export class DbInitiator{
         customer_name varchar(50) NOT NULL,
         tier_id int(11) NOT NULL,
         tier_name varchar(50) NOT NULL,
-        calc_start_date timestamp(3) NOT NULL,
-        date timestamp(3) NOT NULL,
+        spent_from_date datetime(3) NOT NULL,
+        spent_to_date datetime(3) NOT NULL,
+        spent_in_cents INT NOT NULL,
+        calc_date datetime NOT NULL,
         PRIMARY KEY (id)
       );
     `;

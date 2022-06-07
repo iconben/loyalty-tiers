@@ -3,7 +3,7 @@ export interface IOrder {
     customerId: string;
     customerName: string;
     totalInCents: number;
-    date: Date;
+    date: string;
 }
 
 export class Order implements IOrder {
@@ -11,10 +11,10 @@ export class Order implements IOrder {
     customerId: string;
     customerName: string;
     totalInCents: number;
-    date: Date;
+    date: string;
     dateTimestamp: number;
 
-    constructor(orderId: string, customerId: string, customerName: string, totalInCents: number, date: Date) {
+    constructor(orderId: string, customerId: string, customerName: string, totalInCents: number, date: string) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.customerName = customerName;
