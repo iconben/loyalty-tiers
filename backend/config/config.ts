@@ -7,5 +7,6 @@ export class Config {
       user: "root",
       password: "",
       database: "loyalty_tier",
+      timezone: "Z",
     }
 };

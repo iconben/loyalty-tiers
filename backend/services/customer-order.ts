@@ -13,14 +13,17 @@ export class CustomerOrderService {
     private customerRepository = new CustomerRepository();
     private tierRuleRepository = new TierRuleRepository();
 
-    async saveOrder(order: Order): Promise<any> {
+    async saveOrder(order: Order): Promise<CustomerVM> {
         await this.orderRepository.save(order);
         const customer = new Customer(order.customerId, order.customerName, 1);
         // create a new customer if not exist
         await this.customerRepository.saveIfNotExists(customer);
-        // recalculate the customer's loyalty tier
-        if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) === 1) {
-            await this.updateCustomerLoyaltyTier(order.customerId);
+        // recalculate the customer's loyalty tier if the order is of last year
+        if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) === -1) {
+            const customerVM = await this.updateCustomerLoyaltyTier(customer.id);
+            return Promise.resolve(customerVM);
+        } else {
+            return this.decorateToVM(customer);
         }
     }
 
@@ -45,33 +48,36 @@ export class CustomerOrderService {
      */
     async updateAllCustomerLoyaltyTiers(batchSize: number = 500): Promise<any> {
         const customerIds = await this.customerRepository.getAllCustomerIds();
-        const totalNumber = customerIds.length;let affectedRows = 0;let changedRows = 0;
-        const thisBatchIds: string[] = new Array<string>();
-        while(customerIds.length > 0) {
-            for (let i = 0; i < batchSize - 1; i ++) {
-                if (customerIds.length > 0) {
-                    thisBatchIds.push(customerIds.pop());
-                } else {
-                    break;
-                }
+        let affectedRows = 0;let changedRows = 0;
+        let remainingNumber = customerIds.length;
+        while(remainingNumber > 0) {
+            const thisBatchSize = Math.min(batchSize, customerIds.length);
+            const thisBatchIds: string[] = new Array<string>();
+            for (let i = 0; i < thisBatchSize; i ++) {
+                const id = customerIds.pop();
+                thisBatchIds.push(id);
             }
-            const customers = await this.customerRepository.getCustomersByIds(thisBatchIds);
+
+            const batchCustomers = await this.customerRepository.getCustomersByIds(thisBatchIds);
             const totalSpentList = await this.orderRepository.getOrdersTotalByCustomerIds(thisBatchIds, dbDateTimeUtil.getUTCStartOfLastYear(), dbDateTimeUtil.getUTCEndOfLastYear());
             const tierRules = await this.tierRuleRepository.getAll();
-            for (let j = 0; j < customers.length; j ++) {
-                const customer = customers[j];
+            for (let j = 0; j < batchCustomers.length; j ++) {
+                const customer = batchCustomers[j];
+                let totalInCents = 0;
                 for (const totalSpent of totalSpentList) {
                     if (totalSpent.customerId === customer.id) {
-                        customers[j] = this.calculateLoyaltyTier(customer, tierRules, totalSpent.totalInCents);
+                        totalInCents = totalSpent.totalInCents;
                         break;
                     }
                 }
+                batchCustomers[j] = this.calculateLoyaltyTier(customer, tierRules, totalInCents);
             }
-            if (Customer.length > 0) {
-                const batchResult = await this.customerRepository.updateAll(customers);
+            if (batchCustomers.length > 0) {
+                const batchResult = await this.customerRepository.updateAll(batchCustomers);
                 affectedRows += batchResult.affectedRows;
                 changedRows += batchResult.changedRows;
             }
+            remainingNumber -= thisBatchSize;
         }
         return Promise.resolve({
             affectedRows,
@@ -185,8 +191,6 @@ export class CustomerOrderService {
     getAnnualSpentTotalInCents(customerId: string, fullYear: number): Promise<number> {
         const fromDate = dbDateTimeUtil.getUTCStartOfYear(fullYear);
         const toDate = dbDateTimeUtil.getUTCEndOfYear(fullYear);
-        debug(`fromDate: ${fromDate}`);
-        debug(`toDate: ${toDate}`);
-        return this.orderRepository.getCustomerOrdersTotalInCents(customerId, fromDate, toDate);
+        return this.orderRepository.getOrdersTotalByCustomerId(customerId, fromDate, toDate);
     }
 }

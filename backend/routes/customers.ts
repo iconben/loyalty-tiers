@@ -1,5 +1,4 @@
 import express, { Express, Request, Response } from 'express';
-import { CustomerRepository } from '../repositories/customer-repository';
 import { OrderRepository } from '../repositories/order-repository';
 import { CustomerOrderService } from '../services/customer-order';
 import { Order } from '../models/order';
@@ -7,7 +6,6 @@ import { debug } from 'console';
 import { dbDateTimeUtil } from '../utilities/dbDateTimeUtil';
 import { CustomerVM } from '../services/customer-vm';
 
-const customerRepository = new CustomerRepository();
 const orderRepository = new OrderRepository();
 const customerOrderService = new CustomerOrderService();
 
@@ -34,7 +32,7 @@ app.get('/recalculate', (req: Request, res: Response, next) => {
   }).catch((err) => {
     res.status(500).send({
       message: 'Execution failed',
-      error: err
+      error: err.toString()
     });
   });
 });
@@ -48,6 +46,11 @@ app.get('/recalculate', (req: Request, res: Response, next) => {
 app.get('/:customerId/recalculate', (req: Request, res: Response, next) => {
   customerOrderService.updateCustomerLoyaltyTier(req.params.customerId).then((customer) => {
     res.send(customer);
+  }).catch((err) => {
+    res.status(500).send({
+      message: 'Execution failed',
+      error: err.toString()
+    });
   });
 });
 
@@ -67,7 +70,7 @@ app.get('/:customerId', (req: Request, res: Response, next) => {
     }).catch((err: any) => {
         res.status(500).send({
           message: 'Query failed.',
-          error: err
+          error: err.toString()
         });
       });
 });
@@ -81,14 +84,13 @@ app.get('/:customerId', (req: Request, res: Response, next) => {
 app.get('/:customerId/orders', (req: Request, res: Response, next) => {
   // calculate the start time of last year day 1 from local time
   const startDate: any = dbDateTimeUtil.getUTCStartOfLastYear();
-  debug(`startDate: ${startDate}`);
   // get the orders of the customer and return
-  orderRepository.getCustomerOrders(req.params.customerId, startDate).then((result: Order[]) => {
+  orderRepository.getAllByCustomerId(req.params.customerId, startDate).then((result: Order[]) => {
     res.send(result);
   }).catch((err: any) => {
     res.status(500).send({
       message: 'Query failed.',
-      error: err
+      error: err.toString()
     });
   });
 });

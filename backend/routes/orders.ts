@@ -1,3 +1,4 @@
+import { debug } from 'console';
 import express, { Express, Request, Response } from 'express';
 import { Order } from '../models/order';
 import { CustomerOrderService } from '../services/customer-order';
@@ -55,17 +56,25 @@ app.post('/', (req: Request, res: Response, next: any) => {
       });
       return;
     }
+    // make sure the ISO date string is converted into a Date object correctly:
+    try {
+      order.date = new Date(order.date as unknown as string);
+    }catch(e) {
+      res.status(400).send({
+          message: 'Invalid date format.'
+      });
+      return;
+    }
     customerOrderService.saveOrder(order).then((result: any) => {
-        res.status(201);
-        res.end();
-      }).catch((err: any) => {
-          res.status(500).send({
-            message: 'Order Saving failed.',
-            error: err,
-            entity: order
-          });
-        }
-      );
+      res.status(201).send(result);
+    }).catch((err: any) => {
+        res.status(500).send({
+          message: 'Order saving failed.',
+          error: err.toString(),
+          entity: order
+        });
+      }
+    );
   });
 
 export default app;

@@ -3,10 +3,9 @@ export class Order {
     customerId: string;
     customerName: string;
     totalInCents: number;
-    date: string;
-    dateTimestamp: number;
+    date: Date;
 
-    constructor(orderId: string, customerId: string, customerName: string, totalInCents: number, date: string) {
+    constructor(orderId: string, customerId: string, customerName: string, totalInCents: number, date: Date) {
         this.orderId = orderId;
         this.customerId = customerId;
         this.customerName = customerName;

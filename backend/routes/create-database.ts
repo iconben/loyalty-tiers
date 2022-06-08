@@ -18,7 +18,7 @@ app.get('/', (req: Request, res: Response, next: any) => {
       }).catch((err: any) => {
           res.status(500).send({
             message: 'Query failed.',
-            error: err
+            error: err.toString()
           });
         });
   });

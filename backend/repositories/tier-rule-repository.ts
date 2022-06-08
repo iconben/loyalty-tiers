@@ -19,7 +19,7 @@ export class TierRuleRepository extends AbstractRepository {
       FROM tier_rule
       `
     );
-    TierRuleRepository.tierRules = result[0];
+    TierRuleRepository.tierRules = result[0] as TierRule[];
     return Promise.resolve(TierRuleRepository.tierRules);
   }
 }
