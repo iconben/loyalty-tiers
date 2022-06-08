@@ -5,6 +5,7 @@ import { Order } from '../models/order';
 import { debug } from 'console';
 import { dbDateTimeUtil } from '../utilities/dbDateTimeUtil';
 import { CustomerVM } from '../services/customer-vm';
+import cors from 'cors';
 
 const orderRepository = new OrderRepository();
 const customerOrderService = new CustomerOrderService();
@@ -13,6 +14,8 @@ const app: Express = express();
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use(cors());
+
 
 /**
  * @api {post} /customers/recalculate

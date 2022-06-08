@@ -1,4 +1,5 @@
 import { debug } from 'console';
+import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import { Order } from '../models/order';
 import { CustomerOrderService } from '../services/customer-order';
@@ -8,6 +9,10 @@ const customerOrderService = new CustomerOrderService();
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
+app.use(cors({
+  origin: '*'
+  }));
+
 
 /**
  * @api {post} /orders

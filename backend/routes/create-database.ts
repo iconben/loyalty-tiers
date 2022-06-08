@@ -1,8 +1,13 @@
+import cors from 'cors';
 import express, { Express, Request, Response } from 'express';
 import { DbInitiator } from '../config/db-initiator';
 
 const app: Express = express();
 const dbInitiator = new DbInitiator();
+
+app.use(express.urlencoded({extended: true}));
+app.use(express.json());
+app.use(cors());
 
 /**
  * @api {post} /create-database
