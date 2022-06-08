@@ -2,6 +2,7 @@ import { Customer } from "../models/customer";
 
 export class CustomerVM extends Customer {
     currentTierName: string;
+    nextTierName: string;
     nextTierGapInCents: number;
     thisYearSpentInCents: number;
     downgradeTierName: string;

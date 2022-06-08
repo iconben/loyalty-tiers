@@ -147,8 +147,10 @@ export class CustomerOrderService {
                 currentTier = tierRule;
                 customerVM.currentTierName = tierRule.name;
                 if (previousHigherRule !== null) {
+                    customerVM.nextTierName = previousHigherRule.name;
                     customerVM.nextTierGapInCents = previousHigherRule.minSpentInCents - tierRule.minSpentInCents;
                 } else {
+                    customerVM.nextTierName = null;
                     customerVM.nextTierGapInCents = 0;
                 }
                 break;
