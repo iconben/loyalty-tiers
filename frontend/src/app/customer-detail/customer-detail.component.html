@@ -1,1 +1,35 @@
-<p>customer-detail works!</p>
+<h3 *ngIf="customer == null">&nbsp;&nbsp;Customer Not Found</h3>
+<h3 *ngIf="customer != null">&nbsp;&nbsp;{{customer.name}}</h3>
+<div class="card-container" *ngIf="customer == null">
+  <div class="card">
+    Cannot find such customer!
+  </div>
+</div>
+<div class="card-container" *ngIf="customer != null">
+  <div class="card">
+    Current Tier: {{customer.currentTierName}}<br/>
+    From: {{customer.calcFromDate | date: 'medium'}}<br/>
+    To: {{customer.calcToDate | date: 'medium'}}<br/>
+    Total Spent: ${{customer.calcSpentInCents/100}}<br/>
+  </div>
+  <div class="card" *ngIf="customer.nextTierName == null">
+    Congratulations!<br/>
+    You are already at the highest level!<br/>
+    Keep spending!
+  </div>
+  <div class="card" *ngIf="customer.nextTierName != null">
+    Next Tier: {{customer.nextTierName}}<br/>
+    Just spend ${{customer.nextTierGapInCents/100}} more<br/>
+    to reach the {{customer.nextTierName}} tier!
+  </div>
+  <div class="card" *ngIf="customer.downgradeTierName == null">
+    Spent of This Year: ${{customer.thisYearSpentInCents/100}}<br/>
+    You are NOT going to be downgraded in the next year!
+  </div>
+  <div class="card" *ngIf="customer.downgradeTierName != null">
+    This year you spent ${{customer.thisYearSpentInCents/100}}.<br/>
+    Possibly be downgraded To {{customer.downgradeTierName}}<br/>
+    on {{customer.downgradeDate | date: 'medium'}} !<br/>
+    Spent: ${{customer.downgradeGapInCents/100}} more to avoid that!<br/>
+  </div>
+</div>
