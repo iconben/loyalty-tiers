@@ -59,7 +59,7 @@ export class DbInitiator{
     dbConfig.database = '';
     dbConfig.multipleStatements = true;
     const connection = await mysql.createConnection(dbConfig);
-    return connection.query(sql);
+    return await connection.query(sql).finally(() => connection.end());
   }
 }
 
