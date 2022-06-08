@@ -17,7 +17,7 @@ export class ScheduleInitiator {
         if (now.getUTCMonth() === 0 && now.getUTCDate() === 1) {
           debug('It is the first day of the UTC year! Start calculating customer loyalty tiers!');
           const customerOrderService = new CustomerOrderService();
-          customerOrderService.calcAllCustomerLoyaltyTiers();
+          customerOrderService.updateAllCustomerLoyaltyTiers();
         }
       });
   }

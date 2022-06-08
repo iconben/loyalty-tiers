@@ -43,7 +43,7 @@ export class OrderRepository extends AbstractRepository {
   }
 
   /**
-   *
+   * Get the customer's orders total during a period
    * @param customerId the customer id
    * @param fromDate the start date time in db format (YYYY-MM-DD HH:MM:SS.ms)
    * @param toDate the to date time in db format (YYYY-MM-DD HH:MM:SS.ms)
@@ -59,5 +59,26 @@ export class OrderRepository extends AbstractRepository {
       `
     )
     return Promise.resolve(result[0][0].totalInCents == null ? 0 : parseInt(result[0][0].totalInCents, 10));
+  }
+
+  /**
+   * Get the orders total list for many customers during a period
+   * @param customerIds the customer id array
+   * @param fromDate the start date time in db format (YYYY-MM-DD HH:MM:SS.ms)
+   * @param toDate the to date time in db format (YYYY-MM-DD HH:MM:SS.ms)
+   * @returns an array of objects with the customer id and the total spent in cents
+   */
+  async getOrdersTotalByCustomerIds(customerIds: string[], fromDate: string, toDate: string): Promise<any> {
+    const customerIdsString = customerIds.join("','");
+    const result = await this.query(`
+      SELECT customer_id AS customerId, SUM(total_in_cents) AS totalInCents
+      FROM \`order\`
+      WHERE customer_id IN ('${customerIdsString}')
+      AND date >= '${fromDate}'
+      AND date <= '${toDate}'
+      GROUP BY customer_id;
+      `
+    );
+    return Promise.resolve(result[0]);
   }
 }

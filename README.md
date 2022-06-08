@@ -30,7 +30,14 @@ npm start
   {POST} /orders
   ```
 
-- The endpoint to manually recalculate loyalty tier for a customer, just in case:
+- The endpoint to manually recalculate loyalty tier, just in case you need to do it:
+  
+  for all customers:
+
+  ```
+  {GET} /customers/recalculate
+  ```
+  for one customer:
 
   ```
   {GET} /customers/:customerId/recalculate

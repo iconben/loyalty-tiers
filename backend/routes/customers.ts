@@ -17,18 +17,42 @@ app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
 /**
- * @api {post} /customer/:customerId/recalculate Recalculate loyalty tier for a customer
+ * @api {post} /customers/recalculate
+ * @description Recalculate loyalty tier for all customers
+ * @returns a message indicating the number of customers processed
+ */
+app.get('/recalculate', (req: Request, res: Response, next) => {
+  let call: Promise<any>;
+  if (req.query.batchSize) {
+    call = customerOrderService.updateAllCustomerLoyaltyTiers(parseInt(req.query.batchSize as string, 10))
+  } else {
+    call = customerOrderService.updateAllCustomerLoyaltyTiers();
+  }
+  call.then((result) => {
+    result.message = 'Execution successfully completed.';
+    res.send(result);
+  }).catch((err) => {
+    res.status(500).send({
+      message: 'Execution failed',
+      error: err
+    });
+  });
+});
+
+/**
+ * @api {post} /customers/:customerId/recalculate
+ * @description Recalculate loyalty tier for a customer
  * @param {*} customerId the customer id
  * @returns {CustomerVM} the customer view model
  */
 app.get('/:customerId/recalculate', (req: Request, res: Response, next) => {
-  customerOrderService.calcCustomerLoyaltyTier(req.params.customerId).then((customer) => {
+  customerOrderService.updateCustomerLoyaltyTier(req.params.customerId).then((customer) => {
     res.send(customer);
   });
 });
 
 /**
- * @api {get} /customers/:id
+ * @api {get} /customers/:customerId
  * @description Get a customer with spent stats
  * @param {*} customerId the customer id
  * @returns a customer view model
@@ -49,7 +73,7 @@ app.get('/:customerId', (req: Request, res: Response, next) => {
 });
 
 /**
- * @api {get} /customers/:id/orders
+ * @api {get} /customers/:customerId/orders
  * @description Get a customer's orders since the start of last year
  * @param {*} customerId the customer id
  * @returns a list of orders ordered by date desc

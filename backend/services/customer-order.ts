@@ -20,10 +20,15 @@ export class CustomerOrderService {
         await this.customerRepository.saveIfNotExists(customer);
         // recalculate the customer's loyalty tier
         if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) === 1) {
-            await this.calcCustomerLoyaltyTier(order.customerId);
+            await this.updateCustomerLoyaltyTier(order.customerId);
         }
     }
 
+    /**
+     * Get customer view model for a customer id
+     * @param customerId the customer id
+     * @returns a customer view model
+     */
     async getCustomerWithStats(customerId: string): Promise<CustomerVM> {
         const customer = await this.customerRepository.getCustomerById(customerId);
         if (customer === null) {
@@ -33,23 +38,82 @@ export class CustomerOrderService {
         return Promise.resolve(customerVM);
     }
 
-    calcAllCustomerLoyaltyTiers(): Promise<any> {
-        return Promise.resolve(null);
+    /**
+     * Calculate and update loyal tier for all customers
+     * @param batchSize number of the customers that are processed and updated into database in batch, default is 500
+     * @returns the number of affected customers and changed customers
+     */
+    async updateAllCustomerLoyaltyTiers(batchSize: number = 500): Promise<any> {
+        const customerIds = await this.customerRepository.getAllCustomerIds();
+        const totalNumber = customerIds.length;let affectedRows = 0;let changedRows = 0;
+        const thisBatchIds: string[] = new Array<string>();
+        while(customerIds.length > 0) {
+            for (let i = 0; i < batchSize - 1; i ++) {
+                if (customerIds.length > 0) {
+                    thisBatchIds.push(customerIds.pop());
+                } else {
+                    break;
+                }
+            }
+            const customers = await this.customerRepository.getCustomersByIds(thisBatchIds);
+            const totalSpentList = await this.orderRepository.getOrdersTotalByCustomerIds(thisBatchIds, dbDateTimeUtil.getUTCStartOfLastYear(), dbDateTimeUtil.getUTCEndOfLastYear());
+            const tierRules = await this.tierRuleRepository.getAll();
+            for (let j = 0; j < customers.length; j ++) {
+                const customer = customers[j];
+                for (const totalSpent of totalSpentList) {
+                    if (totalSpent.customerId === customer.id) {
+                        customers[j] = this.calculateLoyaltyTier(customer, tierRules, totalSpent.totalInCents);
+                        break;
+                    }
+                }
+            }
+            if (Customer.length > 0) {
+                const batchResult = await this.customerRepository.updateAll(customers);
+                affectedRows += batchResult.affectedRows;
+                changedRows += batchResult.changedRows;
+            }
+        }
+        return Promise.resolve({
+            affectedRows,
+            changedRows
+        });
     }
 
-    async calcCustomerLoyaltyTier(customerId: string): Promise<CustomerVM> {
-        const customer: Customer = await this.customerRepository.getCustomerById(customerId);
+    /**
+     * Calculate and update loyal tier for a customer
+     * @param customerId the customer id
+     * @returns a customer view model
+     */
+    async updateCustomerLoyaltyTier(customerId: string): Promise<CustomerVM> {
+        let customer: Customer = await this.customerRepository.getCustomerById(customerId);
         if (customer === null) {
             return Promise.resolve(null);
         }
         // get last year spent in cents, and update the customer object
         const totalSpentInCents: number = await this.getLastYearSpentTotalInCents(customer.id);
+        const tierRules = await this.tierRuleRepository.getAll();
+
+        customer = this.calculateLoyaltyTier(customer, tierRules, totalSpentInCents);
+        // update the customer to database
+        await this.customerRepository.update(customer);
+
+        const customerVM = this.decorateToVM(customer);
+        return customerVM;
+    }
+
+    /**
+     * Calculate loyal tier for a customer according to last year total spent
+     * @param customer the customer object
+     * @param tierRules the tier rules
+     * @param totalSpentInCents the total spent in cents of last year
+     * @returns updated customer object
+     */
+    private calculateLoyaltyTier(customer: Customer, tierRules: TierRule[], totalSpentInCents: number): Customer {
         customer.calcFromDate = dbDateTimeUtil.toDate(dbDateTimeUtil.getUTCStartOfLastYear());
         customer.calcToDate = dbDateTimeUtil.toDate(dbDateTimeUtil.getUTCEndOfLastYear());
         customer.calcSpentInCents = totalSpentInCents;
 
         // compare with tier rules from highest spent to lowest:
-        const tierRules = await this.tierRuleRepository.getAll();
         tierRules.sort((a, b) => (b.minSpentInCents - a.minSpentInCents));
         for(const tierRule of tierRules) {
             if (customer.calcSpentInCents >= tierRule.minSpentInCents) {
@@ -57,11 +121,7 @@ export class CustomerOrderService {
                 break;
             }
         }
-        // update the customer to database
-        await this.customerRepository.update(customer);
-
-        const customerVM = this.decorateToVM(customer);
-        return customerVM;
+        return customer;
     }
 
     /**
