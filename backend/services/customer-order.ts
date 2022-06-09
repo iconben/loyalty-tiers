@@ -14,12 +14,13 @@ export class CustomerOrderService {
     private tierRuleRepository = new TierRuleRepository();
 
     async saveOrder(order: Order): Promise<CustomerVM> {
-        await this.orderRepository.save(order);
         const customer = new Customer(order.customerId, order.customerName, 1);
-        // create a new customer if not exist
+        // first create a new customer if not exist
         await this.customerRepository.saveIfNotExists(customer);
-        // recalculate the customer's loyalty tier if the order is of last year
-        if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) === -1) {
+        // then save order
+        await this.orderRepository.save(order);
+        // recalculate the customer's loyalty tier if the order is of last year or if the customer is new
+        if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) === -1 || customer.calcFromDate === null) {
             const customerVM = await this.updateCustomerLoyaltyTier(customer.id);
             return Promise.resolve(customerVM);
         } else {
