@@ -151,7 +151,7 @@ export class CustomerOrderService {
                 customerVM.currentTierName = tierRule.name;
                 if (previousHigherRule !== null) {
                     customerVM.nextTierName = previousHigherRule.name;
-                    customerVM.nextTierGapInCents = previousHigherRule.minSpentInCents - tierRule.minSpentInCents;
+                    customerVM.nextTierGapInCents = previousHigherRule.minSpentInCents - customerVM.calcSpentInCents;
                 } else {
                     customerVM.nextTierName = null;
                     customerVM.nextTierGapInCents = 0;
