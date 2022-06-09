@@ -163,7 +163,7 @@ export class CustomerOrderService {
         }
 
         // get this year spent in cents, and update the customer view model
-        const totalSpentInCents: number = await this.getTotalInCentsSinceLastYear(customer.id);
+        const totalSpentInCents: number = await this.getTotalInCentsSinceThisYear(customer.id);
         customerVM.thisYearSpentInCents = totalSpentInCents;
         let thisYearTier: TierRule = null;
         for(const tierRule of tierRules) {
@@ -185,6 +185,11 @@ export class CustomerOrderService {
 
     getTotalInCentsSinceLastYear(customerId: string): Promise<number> {
         const fullYear: number = new Date().getUTCFullYear() - 1;
+        return this.orderRepository.getOrdersTotalByCustomerId(customerId, dbDateTimeUtil.getUTCStartOfYear(fullYear));
+    }
+
+    getTotalInCentsSinceThisYear(customerId: string): Promise<number> {
+        const fullYear: number = new Date().getUTCFullYear();
         return this.orderRepository.getOrdersTotalByCustomerId(customerId, dbDateTimeUtil.getUTCStartOfYear(fullYear));
     }
 

@@ -59,7 +59,6 @@ export class OrderRepository extends AbstractRepository {
     return Promise.resolve(orders);
   }
 
-  async getOrdersTotalByCustomerId(customerId: string, fromDate: string): Promise<number>;
   /**
    * Get the customer's orders total during a period
    * @param customerId the customer id
