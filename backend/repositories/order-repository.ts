@@ -59,6 +59,7 @@ export class OrderRepository extends AbstractRepository {
     return Promise.resolve(orders);
   }
 
+  async getOrdersTotalByCustomerId(customerId: string, fromDate: string): Promise<number>;
   /**
    * Get the customer's orders total during a period
    * @param customerId the customer id
@@ -66,18 +67,21 @@ export class OrderRepository extends AbstractRepository {
    * @param toDate the to date time in db format (YYYY-MM-DD HH:MM:SS.ms)
    * @returns an integer representing the total spent in cents
    */
-  async getOrdersTotalByCustomerId(customerId: string, fromDate: string, toDate: string): Promise<number> {
-    const result = await this.query(`
+  async getOrdersTotalByCustomerId(customerId: string, fromDate: string, toDate?: string): Promise<number> {
+    let query = `
       SELECT SUM(total_in_cents) AS totalInCents
       FROM \`order\`
       WHERE customer_id = '${customerId}'
       AND date >= '${fromDate}'
-      AND date <= '${toDate}';
-      `
-    );
+      `;
+    if (toDate) {
+      query = query.concat(` AND date <= '${toDate}'`);
+    }
+    const result = await this.query(query);
     return Promise.resolve(result[0][0].totalInCents == null ? 0 : parseInt(result[0][0].totalInCents, 10));
   }
 
+  async getOrdersTotalByCustomerIds(customerIds: string[], fromDate: string): Promise<any>;
   /**
    * Get the orders total list for many customers during a period
    * @param customerIds the customer id array
@@ -85,17 +89,17 @@ export class OrderRepository extends AbstractRepository {
    * @param toDate the to date time in db format (YYYY-MM-DD HH:MM:SS.ms)
    * @returns an array of objects with the customer id and the total spent in cents
    */
-  async getOrdersTotalByCustomerIds(customerIds: string[], fromDate: string, toDate: string): Promise<any> {
+  async getOrdersTotalByCustomerIds(customerIds: string[], fromDate: string, toDate?: string): Promise<any> {
     const customerIdsString = customerIds.join("','");
+    const toDateCondition = toDate ? ` AND date <= '${toDate}'` : '';
     const result = await this.query(`
-      SELECT customer_id AS customerId, SUM(total_in_cents) AS totalInCents
-      FROM \`order\`
-      WHERE customer_id IN ('${customerIdsString}')
-      AND date >= '${fromDate}'
-      AND date <= '${toDate}'
-      GROUP BY customer_id;
-      `
-    );
+    SELECT customer_id AS customerId, SUM(total_in_cents) AS totalInCents
+    FROM \`order\`
+    WHERE customer_id IN ('${customerIdsString}')
+    AND date >= '${fromDate}'
+     ${toDateCondition}
+    GROUP BY customer_id;
+    `);
     return Promise.resolve(result[0]);
   }
 }

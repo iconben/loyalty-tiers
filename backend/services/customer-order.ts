@@ -19,8 +19,8 @@ export class CustomerOrderService {
         await this.customerRepository.saveIfNotExists(customer);
         // then save order
         await this.orderRepository.save(order);
-        // recalculate the customer's loyalty tier if the order is of last year or if the customer is new
-        if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) === -1 || customer.calcFromDate === null) {
+        // recalculate the customer's loyalty tier if the order is since last year or if the customer is new
+        if ((new Date(order.date).getUTCFullYear() - new Date().getUTCFullYear()) >= -1 || customer.calcFromDate === null) {
             const customerVM = await this.updateCustomerLoyaltyTier(customer.id);
             return Promise.resolve(customerVM);
         } else {
@@ -60,7 +60,7 @@ export class CustomerOrderService {
             }
 
             const batchCustomers = await this.customerRepository.getCustomersByIds(thisBatchIds);
-            const totalSpentList = await this.orderRepository.getOrdersTotalByCustomerIds(thisBatchIds, dbDateTimeUtil.getUTCStartOfLastYear(), dbDateTimeUtil.getUTCEndOfLastYear());
+            const totalSpentList = await this.orderRepository.getOrdersTotalByCustomerIds(thisBatchIds, dbDateTimeUtil.getUTCStartOfLastYear());
             const tierRules = await this.tierRuleRepository.getAll();
             for (let j = 0; j < batchCustomers.length; j ++) {
                 const customer = batchCustomers[j];
@@ -71,6 +71,8 @@ export class CustomerOrderService {
                         break;
                     }
                 }
+                customer.calcFromDate = dbDateTimeUtil.toDate(dbDateTimeUtil.getUTCStartOfLastYear());
+                customer.calcToDate = new Date();
                 batchCustomers[j] = this.calculateLoyaltyTier(customer, tierRules, totalInCents);
             }
             if (batchCustomers.length > 0) {
@@ -97,10 +99,12 @@ export class CustomerOrderService {
             return Promise.resolve(null);
         }
         // get last year spent in cents, and update the customer object
-        const totalSpentInCents: number = await this.getLastYearSpentTotalInCents(customer.id);
+        const totalSpentInCents: number = await this.getTotalInCentsSinceLastYear(customer.id);
+        customer.calcFromDate = dbDateTimeUtil.toDate(dbDateTimeUtil.getUTCStartOfLastYear());
+        customer.calcToDate = new Date();
         const tierRules = await this.tierRuleRepository.getAll();
-
         customer = this.calculateLoyaltyTier(customer, tierRules, totalSpentInCents);
+
         // update the customer to database
         await this.customerRepository.update(customer);
 
@@ -109,15 +113,13 @@ export class CustomerOrderService {
     }
 
     /**
-     * Calculate loyal tier for a customer according to last year total spent
+     * Calculate loyal tier for a customer according to total spent since last year
      * @param customer the customer object
      * @param tierRules the tier rules
-     * @param totalSpentInCents the total spent in cents of last year
+     * @param totalSpentInCents the total spent in cents since last year
      * @returns updated customer object
      */
     private calculateLoyaltyTier(customer: Customer, tierRules: TierRule[], totalSpentInCents: number): Customer {
-        customer.calcFromDate = dbDateTimeUtil.toDate(dbDateTimeUtil.getUTCStartOfLastYear());
-        customer.calcToDate = dbDateTimeUtil.toDate(dbDateTimeUtil.getUTCEndOfLastYear());
         customer.calcSpentInCents = totalSpentInCents;
 
         // compare with tier rules from highest spent to lowest:
@@ -161,7 +163,7 @@ export class CustomerOrderService {
         }
 
         // get this year spent in cents, and update the customer view model
-        const totalSpentInCents: number = await this.getThisYearSpentTotalInCents(customer.id);
+        const totalSpentInCents: number = await this.getTotalInCentsSinceLastYear(customer.id);
         customerVM.thisYearSpentInCents = totalSpentInCents;
         let thisYearTier: TierRule = null;
         for(const tierRule of tierRules) {
@@ -181,19 +183,24 @@ export class CustomerOrderService {
         return customerVM;
     }
 
-    getLastYearSpentTotalInCents(customerId: string): Promise<number> {
+    getTotalInCentsSinceLastYear(customerId: string): Promise<number> {
         const fullYear: number = new Date().getUTCFullYear() - 1;
-        return this.getAnnualSpentTotalInCents(customerId, fullYear);
+        return this.orderRepository.getOrdersTotalByCustomerId(customerId, dbDateTimeUtil.getUTCStartOfYear(fullYear));
     }
 
-    getThisYearSpentTotalInCents(customerId: string): Promise<number> {
-        const fullYear: number = new Date().getUTCFullYear();
-        return this.getAnnualSpentTotalInCents(customerId, fullYear);
-    }
+    // getLastYearSpentTotalInCents(customerId: string): Promise<number> {
+    //     const fullYear: number = new Date().getUTCFullYear() - 1;
+    //     return this.getAnnualSpentTotalInCents(customerId, fullYear);
+    // }
 
-    getAnnualSpentTotalInCents(customerId: string, fullYear: number): Promise<number> {
-        const fromDate = dbDateTimeUtil.getUTCStartOfYear(fullYear);
-        const toDate = dbDateTimeUtil.getUTCEndOfYear(fullYear);
-        return this.orderRepository.getOrdersTotalByCustomerId(customerId, fromDate, toDate);
-    }
+    // getThisYearSpentTotalInCents(customerId: string): Promise<number> {
+    //     const fullYear: number = new Date().getUTCFullYear();
+    //     return this.getAnnualSpentTotalInCents(customerId, fullYear);
+    // }
+
+    // getAnnualSpentTotalInCents(customerId: string, fullYear: number): Promise<number> {
+    //     const fromDate = dbDateTimeUtil.getUTCStartOfYear(fullYear);
+    //     const toDate = dbDateTimeUtil.getUTCEndOfYear(fullYear);
+    //     return this.orderRepository.getOrdersTotalByCustomerId(customerId, fromDate, toDate);
+    // }
 }

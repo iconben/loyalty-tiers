@@ -26,7 +26,7 @@ npm start
 ### About tier recalculation
 There are two automatic recalculation:
 1. Schedule to run recalculation on the fist day of each UTC year;
-2. Recalculate when a new order for a new customer or when an order belong to last year for an existing customer 
+2. Recalculate when a new order for a new customer or when an order is since last year
 
 ### The endpoints for external app and admins:
 - To report completed order:
