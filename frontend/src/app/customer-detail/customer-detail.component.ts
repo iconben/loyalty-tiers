@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { CustomerOrderService } from '../customer-order.service';
 import { Customer } from '../models/customer';
 
@@ -9,15 +10,16 @@ import { Customer } from '../models/customer';
 })
 export class CustomerDetailComponent implements OnInit {
 
-  constructor(private customerService: CustomerOrderService) { }
+  constructor(private customerService: CustomerOrderService, private route: ActivatedRoute,) { }
 
   customer: Customer | null = null;
 
   ngOnInit(): void {
-    this.loadCustomer(131);
+    this.loadCustomer();
   }
 
-  loadCustomer(id: number) {
+  loadCustomer() {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
     this.customerService.findCustomer(id)
       .subscribe(customer => this.customer = customer);
   }
