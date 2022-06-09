@@ -28,14 +28,14 @@ There are two automatic recalculation:
 1. Schedule to run recalculation on the fist day of each UTC year;
 2. Recalculate when a new order for a new customer or when an order is since last year
 
-### The endpoints for external app and admins:
-- To report completed order:
+### The endpoints:
+- 1. To report completed order:
 
   ```
   {POST} /orders
   ```
 
-- To manually recalculate loyalty tier:
+- 2. To manually recalculate loyalty tier:
   
   for all customers:
 
@@ -47,6 +47,14 @@ There are two automatic recalculation:
   ```
   {GET} /customers/:customerId/recalculate
   ```
+
+- 3. To return customer information:
+  ```
+  {GET} /customers/:customerId
+  ```
+
+- 4. To list a customer's orders:
+  {GET} //customers/:customerId/orders
 
 ### Develop backend
 If you want to develop the backend with hot reload, run:
