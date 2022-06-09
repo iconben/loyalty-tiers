@@ -9,8 +9,11 @@ Before running backend server, there should be a mariaDB/mySQL instance running 
       user: "root",
       password: "",
       database: "loyalty_tier",
+      connectionLimit: 20,
 ```
 Please feel free to change the settings if necessary, the settings reside in ./config/config.ts.
+
+The connectionLimit is for the connection pool size, please adjust on your needs.
 
 *HINT: You do NOT need to manually create the database as long as the provided database user is with database creation permission. On startup the server will AUTOMATICALLY create the database if it does not exist and create all related tables, indexes, and load the initial data.*
 
