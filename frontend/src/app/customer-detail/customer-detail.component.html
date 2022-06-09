@@ -35,7 +35,6 @@
     <div class="card">
       Current Tier: {{customer.currentTierName}}<br/>
       From: {{customer.calcFromDate | date: 'yyyy-MM-dd HH:mm:ss'}}<br/>
-      To: {{customer.calcToDate | date: 'yyyy-MM-dd HH:mm:ss'}}<br/>
       Total Spent: ${{customer.calcSpentInCents/100}}<br/>
     </div>
     <div class="card" *ngIf="customer.nextTierName == null">
