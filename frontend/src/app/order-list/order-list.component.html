@@ -25,8 +25,11 @@
 
   </div>
 
-  <h3 *ngIf="customerName == null">&nbsp;&nbsp;</h3>
-  <h3 *ngIf="customerName != null">&nbsp;&nbsp;{{customerName}}</h3>
+  <div id="customerName">
+    <h3 *ngIf="customerName == null">&nbsp;&nbsp;</h3>
+    <h3 *ngIf="customerName != null">&nbsp;&nbsp;{{customerName}}</h3>
+  </div>
+
   <div class="card-container" *ngIf="orders == null">
     <div class="card">
       Cannot find such orders!

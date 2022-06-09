@@ -1,3 +1,6 @@
+#customerName {
+  width: 250px;
+}
 
 button {
   background: #1e14af;
@@ -122,6 +125,18 @@ svg#clouds {
 
 #paginator span {
   width: 20%;
+}
+
+#paginator span:nth-child(3) {
+  text-align: center;
+}
+
+#paginator span:nth-child(4) {
+  text-align: right;
+}
+
+#paginator span:nth-child(5) {
+  text-align: right;
 }
 
 #paginator span.enabled {

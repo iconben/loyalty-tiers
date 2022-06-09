@@ -75,25 +75,25 @@ export class OrderListComponent implements OnInit, AfterViewInit {
   }
 
   onClickFirst() {
-    if (this.page != null) {
+    if (this.page != null && this.page.hasPrevious()) {
       this.getOrders(this.page.firstPageable());
     }
   }
 
   onClickPrevious() {
-    if (this.page != null) {
+    if (this.page != null && this.page.hasPrevious()) {
       this.getOrders(this.page.previousPageable());
     }
   }
 
   onClickNext() {
-    if (this.page != null) {
+    if (this.page != null && this.page.hasNext()) {
       this.getOrders(this.page.nextPageable());
     }
   }
 
   onClickLast() {
-    if (this.page != null) {
+    if (this.page != null && this.page.hasNext()) {
       this.getOrders(this.page.lastPageable());
     }
   }
