@@ -6,6 +6,8 @@ import { debug } from 'console';
 import { dbDateTimeUtil } from '../utilities/dbDateTimeUtil';
 import { CustomerVM } from '../services/customer-vm';
 import cors from 'cors';
+import { PageableImp } from '../services/pageableImp';
+import { Page } from '../repositories/page';
 
 const orderRepository = new OrderRepository();
 const customerOrderService = new CustomerOrderService();
@@ -85,11 +87,18 @@ app.get('/:customerId', (req: Request, res: Response, next) => {
  * @returns a list of orders ordered by date desc
  */
 app.get('/:customerId/orders', (req: Request, res: Response, next) => {
+  const pageable = new PageableImp(req);
   // calculate the start time of last year day 1 from local time
   const startDate: any = dbDateTimeUtil.getUTCStartOfLastYear();
   // get the orders of the customer and return
-  orderRepository.getAllByCustomerId(req.params.customerId, startDate).then((result: Order[]) => {
-    res.send(result);
+  orderRepository.getAllByCustomerId(req.params.customerId, startDate, pageable).then((result: Order[] | Page<Order>) => {
+    if (result instanceof Page) {
+      res.setHeader('X-Page', result.getPage().toString());
+      res.setHeader('X-Size', result.getSize().toString());
+      res.send(result.getContent());
+    } else {
+      res.send(result);
+  }
   }).catch((err: any) => {
     res.status(500).send({
       message: 'Query failed.',

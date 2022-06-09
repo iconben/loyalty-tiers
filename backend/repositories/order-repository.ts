@@ -3,6 +3,8 @@ import { Order } from '../models/order';
 import { debug } from 'console';
 import { dbDateTimeUtil } from '../utilities/dbDateTimeUtil';
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
+import { Pageable } from './pageable';
+import { Page } from './page';
 
 export class OrderRepository extends AbstractRepository {
   constructor() {
@@ -30,17 +32,21 @@ export class OrderRepository extends AbstractRepository {
    * @param {*} fromDate the start date time in db format (YYYY-MM-DD HH:MM:SS.ms).
    * @returns an order list ordered by date desc.
    */
-  async getAllByCustomerId(customerId: string, fromDate: string): Promise<Order[]> {
+  async getAllByCustomerId(customerId: string, fromDate: string, pageable?: Pageable): Promise<Order[] | Page<Order>> {
+    const pageCondition = pageable && pageable.isPaged() ? ` LIMIT ${pageable.getSize()} OFFSET ${pageable.getPage() * pageable.getSize()} ` : '';
     const result = await this.query(`
       SELECT order_id AS orderId, customer_id AS customerId, customer_name AS customerName, date, total_in_cents AS totalInCents
       FROM \`order\`
       WHERE customer_id = '${customerId}'
       AND date >= '${fromDate}'
-      ORDER BY date DESC;
+      ORDER BY date DESC
+      ${pageCondition};
       `
     );
-
-    const orders = result[0] as Order[];
+    let orders: Order[] | Page<Order> = result[0] as Order[];
+    if (pageable && pageable.isPaged()) {
+      orders = new Page<Order>(pageable, orders);
+    }
     return Promise.resolve(orders);
   }
 
