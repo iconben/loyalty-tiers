@@ -1,4 +1,16 @@
 
+button {
+  background: #1e14af;
+  border: none;
+  border-radius: 0.3rem;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin: 1rem 0;
+  padding: 0.5rem 1rem;
+  width: 250px;
+}
+
 .content {
   display: flex;
   margin: 82px auto 32px;
@@ -42,10 +54,6 @@ svg.material-icons:not(:last-child) {
   width: 168px;
 }
 
-.card-container .card:not(.highlight-card) {
-  cursor: pointer;
-}
-
 .card-container .card:not(.highlight-card):hover {
   transform: translateY(-3px);
   box-shadow: 0 4px 17px rgba(0, 0, 0, 0.35);
@@ -56,7 +64,7 @@ svg.material-icons:not(:last-child) {
 }
 
 .card.highlight-card {
-  background-color: #1976d2;
+  background-color: #1e14af;
   color: white;
   font-weight: 600;
   border: none;
@@ -87,7 +95,7 @@ svg#rocket-smoke {
 a,
 a:visited,
 a:hover {
-  color: #1976d2;
+  color: #1e14af;
   text-decoration: none;
 }
 
@@ -105,6 +113,10 @@ svg#clouds {
 
 /* Responsive Styles */
 @media screen and (max-width: 767px) {
+  button {
+    width: 230px;
+  }
+
   .card-container > *:not(.circle-link) ,
 
   .card:not(.highlight-card) {
@@ -127,6 +139,10 @@ svg#clouds {
 }
 
 @media screen and (max-width: 575px) {
+  button {
+    width: 220px;
+  }
+
   .card:not(.highlight-card) {
     margin: 5px 0;
     width: 220px;

@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CustomerOrderService } from '../customer-order.service';
 import { Customer } from '../models/customer';
 
@@ -10,7 +10,7 @@ import { Customer } from '../models/customer';
 })
 export class CustomerDetailComponent implements OnInit {
 
-  constructor(private customerService: CustomerOrderService, private route: ActivatedRoute,) { }
+  constructor(private customerService: CustomerOrderService, private route: ActivatedRoute, private router: Router) { }
 
   customer: Customer | null = null;
 
@@ -24,4 +24,9 @@ export class CustomerDetailComponent implements OnInit {
       .subscribe(customer => this.customer = customer);
   }
 
+  onClick() {
+    if (this.customer != null) {
+      this.router.navigate([`customers/${this.customer.id}/orders`]);
+    }
+  }
 }
