@@ -32,7 +32,7 @@
       Cannot find such orders!
     </div>
   </div>
-  <div *ngIf="orders != null">
+  <div [hidden]="orders == null">
     <div class="card-container" *ngFor="let order of orders">
       <div class="card">
         Order ID: {{order.orderId}}<br/>
@@ -40,9 +40,18 @@
         Order Total: ${{order.totalInCents/100}}<br/>
       </div>
     </div>
+
+    <div id="paginator" [hidden]=" !page || page.getTotalPages() <= 1 ">
+      <span #firstPage id="first" [ngClass]=" page && page.hasPrevious() ? 'enabled' : 'disabled' ">&lt;&lt;</span>
+      <span #previousPage id="previous" [ngClass]=" page && page.hasPrevious() ? 'enabled' : 'disabled' ">&lt;</span>
+      <span id="current" *ngIf=" page && page.getTotalPages() > 1 ">{{page.getPage() + 1}}</span>
+      <span #nextPage id="next" [ngClass]=" page && page.hasNext() ? 'enabled' : 'disabled' ">&gt;</span>
+      <span #lastPage id="last" [ngClass]=" page && page.hasNext() ? 'enabled' : 'disabled' ">&gt;&gt;</span>
+    </div>
+
   </div>
 
-  <button type="button" (click)="onClick()" *ngIf="orders != null"> &lt; Back to Customer</button>
+  <button type="button" (click)="onClickToCustomer()" *ngIf="orders != null"> &lt; Back to Customer</button>
   <button type="button" (click)="onClickHome()">Home</button>
 
   <svg id="clouds" xmlns="http://www.w3.org/2000/svg" width="2611.084" height="485.677" viewBox="0 0 2611.084 485.677">

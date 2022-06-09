@@ -16,7 +16,9 @@ const app: Express = express();
 
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  exposedHeaders: ['X-Total-Count', 'X-Page', 'X-Size'],
+}));
 
 
 /**
