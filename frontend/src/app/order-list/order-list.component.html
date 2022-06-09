@@ -47,7 +47,7 @@
     <div id="paginator" [hidden]=" !page || page.getTotalPages() <= 1 ">
       <span #firstPage id="first" [ngClass]=" page && page.hasPrevious() ? 'enabled' : 'disabled' ">&lt;&lt;</span>
       <span #previousPage id="previous" [ngClass]=" page && page.hasPrevious() ? 'enabled' : 'disabled' ">&lt;</span>
-      <span id="current" *ngIf=" page && page.getTotalPages() > 1 ">{{page.getPage() + 1}}</span>
+      <span id="current" *ngIf=" page && page.getTotalPages() > 1 ">{{page.getPage() + 1}}/{{page.getTotalPages()}}</span>
       <span #nextPage id="next" [ngClass]=" page && page.hasNext() ? 'enabled' : 'disabled' ">&gt;</span>
       <span #lastPage id="last" [ngClass]=" page && page.hasNext() ? 'enabled' : 'disabled' ">&gt;&gt;</span>
     </div>
