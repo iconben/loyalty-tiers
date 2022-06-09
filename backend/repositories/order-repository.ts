@@ -45,7 +45,16 @@ export class OrderRepository extends AbstractRepository {
     );
     let orders: Order[] | Page<Order> = result[0] as Order[];
     if (pageable && pageable.isPaged()) {
-      orders = new Page<Order>(pageable, orders);
+      // Get the total count if the pageable is paged
+      const totalResult = await this.query(`
+        SELECT COUNT(*) AS count
+        FROM \`order\`
+        WHERE customer_id = '${customerId}'
+        AND date >= '${fromDate}'
+        `
+      );
+      const totalCount = totalResult[0][0].count == null ? 0 : parseInt(totalResult[0][0].count, 10)
+      orders = new Page<Order>(pageable, orders, totalCount);
     }
     return Promise.resolve(orders);
   }

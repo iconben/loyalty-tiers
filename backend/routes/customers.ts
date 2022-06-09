@@ -93,6 +93,7 @@ app.get('/:customerId/orders', (req: Request, res: Response, next) => {
   // get the orders of the customer and return
   orderRepository.getAllByCustomerId(req.params.customerId, startDate, pageable).then((result: Order[] | Page<Order>) => {
     if (result instanceof Page) {
+      res.setHeader('X-Total-Count', result.getTotalCount().toString());
       res.setHeader('X-Page', result.getPage().toString());
       res.setHeader('X-Size', result.getSize().toString());
       res.send(result.getContent());
