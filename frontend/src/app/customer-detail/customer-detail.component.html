@@ -34,7 +34,7 @@
   <div class="card-container" *ngIf="customer != null">
     <div class="card">
       Current Tier: {{customer.currentTierName}}<br/>
-      From: {{customer.calcFromDate | date: 'yyyy-MM-dd HH:mm:ss'}}<br/>
+      From: {{customer.calcFromDate | date: 'yyyy-MM-dd HH:mm:ss' : 'UTC'}}<br/>
       Total Spent: ${{customer.calcSpentInCents/100}}<br/>
     </div>
     <div class="card" *ngIf="customer.nextTierName == null">
@@ -54,7 +54,7 @@
     <div class="card" *ngIf="customer.downgradeTierName != null">
       This year you have spent ${{customer.thisYearSpentInCents/100}}.<br/>
       Possibly be downgraded To {{customer.downgradeTierName}}<br/>
-      on {{customer.downgradeDate | date: 'yyyy-MM-dd HH:mm:ss'}} !<br/>
+      on {{customer.downgradeDate | date: 'yyyy-MM-dd HH:mm:ss' : 'UTC'}} !<br/>
       Spent: ${{customer.downgradeGapInCents/100}} more to stay at {{customer.currentTierName}}!<br/>
     </div>
   </div>

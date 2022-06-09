@@ -36,7 +36,7 @@
     <div class="card-container" *ngFor="let order of orders">
       <div class="card">
         Order ID: {{order.orderId}}<br/>
-        Date: {{order.date| date: 'yyyy-MM-dd HH:mm:ss'}}<br/>
+        Date: {{order.date| date: 'yyyy-MM-dd HH:mm:ss' : 'UTC'}}<br/>
         Order Total: ${{order.totalInCents/100}}<br/>
       </div>
     </div>
