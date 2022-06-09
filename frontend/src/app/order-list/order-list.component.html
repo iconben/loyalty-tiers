@@ -32,11 +32,11 @@
       Cannot find such orders!
     </div>
   </div>
-  <div class="card-container" *ngIf="orders != null">
-    <div *ngFor="let order of orders">
+  <div *ngIf="orders != null">
+    <div class="card-container" *ngFor="let order of orders">
       <div class="card">
         Order ID: {{order.orderId}}<br/>
-        Date: {{order.date| date: 'medium'}}<br/>
+        Date: {{order.date| date: 'yyyy-MM-dd HH:mm:ss'}}<br/>
         Order Total: ${{order.totalInCents/100}}<br/>
       </div>
     </div>
