@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(cors());
 
 /**
- * @api {post} /create-database
+ * @api {get} /create-database
  * @description Create the database
  */
 app.get('/', (req: Request, res: Response, next: any) => {

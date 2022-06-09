@@ -18,7 +18,7 @@ app.use(cors());
 
 
 /**
- * @api {post} /customers/recalculate
+ * @api {get} /customers/recalculate
  * @description Recalculate loyalty tier for all customers
  * @returns a message indicating the number of customers processed
  */
@@ -41,7 +41,7 @@ app.get('/recalculate', (req: Request, res: Response, next) => {
 });
 
 /**
- * @api {post} /customers/:customerId/recalculate
+ * @api {get} /customers/:customerId/recalculate
  * @description Recalculate loyalty tier for a customer
  * @param {*} customerId the customer id
  * @returns {CustomerVM} the customer view model
