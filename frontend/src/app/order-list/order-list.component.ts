@@ -33,9 +33,9 @@ export class OrderListComponent implements OnInit {
     }
   }
   onClick() {
-    const customerId = Number(this.route.snapshot.paramMap.get('id'));
+    const customerId = this.route.snapshot.paramMap.get('id');
     if (customerId != null) {
-      this.router.navigate([`customers/${customerId}`]);
+      this.router.navigate([`/customers/${encodeURIComponent(customerId)}`]);
     }
   }
 

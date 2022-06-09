@@ -27,7 +27,7 @@ export class CustomerDetailComponent implements OnInit {
 
   onClick() {
     if (this.customer != null) {
-      this.router.navigate([`/customers/${this.customer.id}/orders`]);
+      this.router.navigate([`/customers/${encodeURIComponent(this.customer.id)}/orders`]);
     }
   }
 

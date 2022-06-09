@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit {
 
   onClick() {
     if (this.customerId != null && this.customerId.length > 0) {
-      this.router.navigate([`customers/${this.customerId}`]);
+      this.router.navigate([`customers/${encodeURIComponent(this.customerId)}`]);
     }
   }
 

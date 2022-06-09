@@ -53,10 +53,10 @@
       You are NOT going to be downgraded in the next year!
     </div>
     <div class="card" *ngIf="customer.downgradeTierName != null">
-      This year you spent ${{customer.thisYearSpentInCents/100}}.<br/>
+      This year you have spent ${{customer.thisYearSpentInCents/100}}.<br/>
       Possibly be downgraded To {{customer.downgradeTierName}}<br/>
       on {{customer.downgradeDate | date: 'medium'}} !<br/>
-      Spent: ${{customer.downgradeGapInCents/100}} more to avoid that!<br/>
+      Spent: ${{customer.downgradeGapInCents/100}} more to stay at {{customer.currentTierName}}!<br/>
     </div>
   </div>
 
