@@ -21,19 +21,25 @@ export class OrderListComponent implements OnInit {
   }
 
   getOrders() {
-    const customerId = Number(this.route.snapshot.paramMap.get('id'));
-    this.customerService.findOrders(customerId)
-      .subscribe(orders => {
-        this.orders = orders;
-        if (!this.customerName && orders && orders.length > 0) {
-          this.customerName = orders[0].customerName;
-        }
-      });
+    const customerId = this.route.snapshot.paramMap.get('id');
+    if (customerId != null) {
+      this.customerService.findOrders(customerId)
+        .subscribe(orders => {
+          this.orders = orders;
+          if (!this.customerName && orders && orders.length > 0) {
+            this.customerName = orders[0].customerName;
+          }
+        });
+    }
   }
   onClick() {
     const customerId = Number(this.route.snapshot.paramMap.get('id'));
     if (customerId != null) {
       this.router.navigate([`customers/${customerId}`]);
     }
+  }
+
+  onClickHome() {
+    this.router.navigate(['/home']);
   }
 }

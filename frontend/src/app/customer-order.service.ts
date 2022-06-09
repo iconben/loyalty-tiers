@@ -13,12 +13,12 @@ export class CustomerOrderService {
 
   constructor(private httpClient: HttpClient) { }
 
-  findCustomer(id: number): Observable<Customer | null> {
+  findCustomer(id: string): Observable<Customer | null> {
     return this.httpClient.get<Customer>(`${environment.baseUrl}/customers/${id}`, { observe: "response" })
     .pipe(map((response: HttpResponse<Customer>) => response.body));
   }
 
-  findOrders(customerId: number): Observable<Order[] | null> {
+  findOrders(customerId: string): Observable<Order[] | null> {
     return this.httpClient.get<Order[]>(`${environment.baseUrl}/customers/${customerId}/orders`, { observe: "response" })
     .pipe(map((response: HttpResponse<Order[]>) => response.body));
   }

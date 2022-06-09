@@ -25,11 +25,10 @@
 
   </div>
 
-  <h3 *ngIf="customer == null">&nbsp;&nbsp;Customer Not Found</h3>
   <h3 *ngIf="customer != null">&nbsp;&nbsp;{{customer.name}}</h3>
   <div class="card-container" *ngIf="customer == null">
     <div class="card">
-      Cannot find such customer!
+      Cannot find such a customer.
     </div>
   </div>
   <div class="card-container" *ngIf="customer != null">
@@ -61,7 +60,8 @@
     </div>
   </div>
 
-  <button type="button" (click)="onClick()">View Order History &gt;</button>
+  <button type="button" (click)="onClick()" *ngIf="customer != null">View Order History &gt;</button>
+  <button type="button" (click)="onClickHome()">Home</button>
 
   <svg id="clouds" xmlns="http://www.w3.org/2000/svg" width="2611.084" height="485.677" viewBox="0 0 2611.084 485.677">
     <title>Gray Clouds Background</title>

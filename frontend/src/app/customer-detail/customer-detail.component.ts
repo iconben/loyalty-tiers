@@ -19,14 +19,19 @@ export class CustomerDetailComponent implements OnInit {
   }
 
   loadCustomer() {
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    const id: string = this.route.snapshot.paramMap.get('id') as string;
+    console.log(id);
     this.customerService.findCustomer(id)
       .subscribe(customer => this.customer = customer);
   }
 
   onClick() {
     if (this.customer != null) {
-      this.router.navigate([`customers/${this.customer.id}/orders`]);
+      this.router.navigate([`/customers/${this.customer.id}/orders`]);
     }
+  }
+
+  onClickHome() {
+    this.router.navigate(['/home']);
   }
 }
