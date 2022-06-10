@@ -8,13 +8,16 @@ export class Pageable {
 
     private static defaultSize: number = 10;
 
+    /**
+     * Creates a new Pageable object.
+     * @param page page number, 0 if null.
+     * @param size page size, Pageable.defaultSize if null.
+     */
     constructor(page: number, size: number) {
-        this.page = page;
-        this.size = size;
-        if (this.isPaged()) {
-            if (this.size <= 0) {
-                this.size = Pageable.defaultSize;
-            }
+        this.page = page != null ? page : 0;
+        this.size = size != null ? size : Pageable.defaultSize;
+        if (this.isPaged() && this.size <= 0) {
+            this.size = Pageable.defaultSize;
         }
     }
 

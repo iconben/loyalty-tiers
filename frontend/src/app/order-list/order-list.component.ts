@@ -24,6 +24,8 @@ export class OrderListComponent implements OnInit, AfterViewInit {
   @ViewChild('lastPage', { static: true})
   lastPage!: ElementRef;
 
+  customerId?: string;
+
   customerName?: string;
 
   page: Page<Order> | null = null;
@@ -33,14 +35,29 @@ export class OrderListComponent implements OnInit, AfterViewInit {
   constructor(private customerService: CustomerOrderService, private route: ActivatedRoute, private router: Router) { }
 
   ngOnInit(): void {
+    Pageable.setDefaultSize(3);
+    this.route.params.subscribe(params => {
+      this.customerId = params['id'];
+    });
+    this.route.queryParams.subscribe(params => {
+      const page = params['page'] ? parseInt(params['page'], 10) -1 : 0;
+      const size = params['size'];
+      let pageable = null;
+      pageable = new Pageable(page, size);
+      this.getOrderPage(this.customerId, pageable);
+    });
   }
 
   ngAfterViewInit(): void {
-    this.getOrders();
+    this.firstPage.nativeElement.addEventListener('click', this.onClickFirst.bind(this));
+    this.previousPage.nativeElement.addEventListener('click', this.onClickPrevious.bind(this));
+
+    this.lastPage.nativeElement.addEventListener('click', this.onClickLast.bind(this));
+    this.nextPage.nativeElement.addEventListener('click', this.onClickNext.bind(this));
   }
 
-  getOrders(pageable?: Pageable) {
-    const customerId = this.route.snapshot.paramMap.get('id');
+  getOrderPage(customerId?: string, pageable?: Pageable) {
+    console.log(`get order page ${pageable} for customer ${customerId}`);
     if (customerId == null) {
       return;
     }
@@ -57,45 +74,35 @@ export class OrderListComponent implements OnInit, AfterViewInit {
         if (!this.customerName && this.orders && this.orders.length > 0) {
           this.customerName = this.orders[0].customerName;
         }
-        if (this.page.hasPrevious()) {
-          this.firstPage.nativeElement.addEventListener('click', this.onClickFirst.bind(this));
-          this.previousPage.nativeElement.addEventListener('click', this.onClickPrevious.bind(this));
-        } else {
-          this.firstPage.nativeElement.removeEventListener('click', this.onClickFirst.bind(this));
-          this.previousPage.nativeElement.removeEventListener('click', this.onClickPrevious.bind(this));
-        }
-        if (this.page.hasNext()) {
-          this.lastPage.nativeElement.addEventListener('click', this.onClickLast.bind(this));
-          this.nextPage.nativeElement.addEventListener('click', this.onClickNext.bind(this));
-        } else {
-          this.lastPage.nativeElement.removeEventListener('click', this.onClickLast.bind(this));
-          this.nextPage.nativeElement.removeEventListener('click', this.onClickNext.bind(this));
-        }
       });
   }
 
   onClickFirst() {
-    if (this.page != null && this.page.hasPrevious()) {
-      this.getOrders(this.page.firstPageable());
+    if (this.customerId != null && this.page != null && this.page.hasPrevious()) {
+      this.navigateToPage(this.customerId, this.page.firstPageable());
     }
   }
 
   onClickPrevious() {
-    if (this.page != null && this.page.hasPrevious()) {
-      this.getOrders(this.page.previousPageable());
+    if (this.customerId != null && this.page != null && this.page.hasPrevious()) {
+      this.navigateToPage(this.customerId, this.page.previousPageable());
     }
   }
 
   onClickNext() {
-    if (this.page != null && this.page.hasNext()) {
-      this.getOrders(this.page.nextPageable());
+    if (this.customerId != null && this.page != null && this.page.hasNext()) {
+      this.navigateToPage(this.customerId, this.page.nextPageable());
     }
   }
 
   onClickLast() {
-    if (this.page != null && this.page.hasNext()) {
-      this.getOrders(this.page.lastPageable());
+    if (this.customerId != null && this.page != null && this.page.hasNext()) {
+      this.navigateToPage(this.customerId, this.page.lastPageable());
     }
+  }
+
+  navigateToPage(customerId: string, pageable: Pageable) {
+    this.router.navigate([`/customers/${encodeURIComponent(customerId)}/orders`], { queryParams: { page: pageable.getPage() + 1, size: pageable.getSize() } });
   }
 
   onClickToCustomer() {

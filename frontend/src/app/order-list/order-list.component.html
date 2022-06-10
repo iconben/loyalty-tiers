@@ -30,12 +30,13 @@
     <h3 *ngIf="customerName != null">&nbsp;&nbsp;{{customerName}}</h3>
   </div>
 
-  <div class="card-container" *ngIf="orders == null">
+  <div class="card-container" *ngIf="orders == null || orders.length == 0">
     <div class="card">
-      Cannot find such orders!
+      No records found!
     </div>
   </div>
-  <div [hidden]="orders == null">
+
+  <div [style.visibility]=" orders == null ? 'hidden' : 'visible' ">
     <div class="card-container" *ngFor="let order of orders">
       <div class="card">
         Order ID: {{order.orderId}}<br/>
@@ -44,7 +45,7 @@
       </div>
     </div>
 
-    <div id="paginator" [hidden]=" !page || page.getTotalPages() <= 1 ">
+    <div id="paginator" [style.visibility]=" (orders == null || !page || page.getTotalPages() <= 1) ? 'hidden' : 'visible' ">
       <span #firstPage id="first" [ngClass]=" page && page.hasPrevious() ? 'enabled' : 'disabled' ">&lt;&lt;</span>
       <span #previousPage id="previous" [ngClass]=" page && page.hasPrevious() ? 'enabled' : 'disabled' ">&lt;</span>
       <span id="current" *ngIf=" page && page.getTotalPages() > 1 ">{{page.getPage() + 1}}/{{page.getTotalPages()}}</span>
