@@ -8,11 +8,11 @@ export class AbstractRepository {
   private static _pool: mysql.Pool;
 
   protected static pool(): mysql.Pool {
+    Config.db.multipleStatements = true;
     return this._pool || (this._pool = mysql.createPool(Config.db));
   }
 
   async execute(sql: any, params?: any): Promise<[mysql.RowDataPacket[] | mysql.RowDataPacket[][] | mysql.OkPacket | mysql.OkPacket[] | mysql.ResultSetHeader, mysql.FieldPacket[]]> {
-    Config.db.multipleStatements = true;
     if (params) {
       return AbstractRepository.pool().execute(sql, params);
     } else {
@@ -21,7 +21,8 @@ export class AbstractRepository {
   }
 
   async query(sql: any, params?: any, multipleStatements = false): Promise<[mysql.RowDataPacket[] | mysql.RowDataPacket[][] | mysql.OkPacket | mysql.OkPacket[] | mysql.ResultSetHeader, mysql.FieldPacket[]]> {
-    Config.db.multipleStatements = multipleStatements;
+    debug(params);
+    debug(sql);
     if (params) {
       return AbstractRepository.pool().query(sql, params);
     } else {

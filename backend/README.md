@@ -25,8 +25,10 @@ npm start
 
 ### About tier recalculation
 There are two automatic recalculation:
-1. Schedule to run recalculation on the fist day of each UTC year;
+1. Schedule to run recalculation on the fist day of each UTC year, the app will update customers in batch, the default batch size is 500;
 2. Recalculate when a new order for a new customer or when an order is since last year
+
+Also you can manually call the recalculate API, see below.
 
 ### The endpoints:
 - 1. To report completed order:
@@ -40,7 +42,7 @@ There are two automatic recalculation:
   for all customers:
 
   ```
-  {GET} /customers/recalculate
+  {GET} /customers/recalculate?batchSize=500
   ```
   for one customer:
 
